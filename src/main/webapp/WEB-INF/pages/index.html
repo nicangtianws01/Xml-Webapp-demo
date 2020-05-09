@@ -2,10 +2,133 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>index demo</title>
+    <style>
+        .key{
+            padding:5px;
+            border-radius:20px;
+            border:1px solid blue;
+            outline: none;
+        }
+        .d{
+            padding:5px 10px;
+            border:1px solid #ccc;
+            border-radius:20px;
+            outline: none;
+            background-color: white;
+            color: black;
+        }
+        .d:hover{
+            background-color: blue;
+            border-color: white;
+            color: white;
+        }
+
+    </style>
 </head>
 <body>
-    <h1>成功导入demo项目</h1>
+<form>
+    <input type="text" id="keyword" class="key" placeholder="请输入关键字">
+    <button type="button" onclick="getExcel" class="d">点击下载excel表</button>
+</form>
+<script>
+        //创建遮罩层
+        function createMask(){
+            var node=document.createElement('div');
+                node.setAttribute('id','backdrop');
+                node.style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;background-color:rgba(0,0,0,0.6);";
+                node.style.display="none";
+            var html='<div style="position: fixed; top: 50%; left: 50%; z-index: 1001;">';
+                html+='<div style="text-align:center;">';
+                html+='<span style="width:60px;height:60px;margin:-30px 0 0 -30px;font-size:30px;color:white;">加载中...</span>';
+                html+='</div>';
+                html+='</div>';
+                node.innerHTML=html;
+            var body=document.querySelector('body');
+                body.appendChild(node);
+        }
+
+        //开启遮罩层
+        function showMask(){
+            var backdrop=document.getElementById('backdrop');
+                backdrop.style.display='block';
+        }
+
+        //关闭遮罩层
+        function closeMask(){
+            var backdrop=document.getElementById('backdrop');
+                backdrop.style.display='none';
+        }
+
+        //页面初始化，开启遮罩
+        createMask();
+        showMask();
+
+        //页面初始化完成，关闭遮罩
+        document.onreadystatechange = function(){
+            if(document.readyState == "complete"){
+                closeMask();
+            }
+        }
+
+        //excel
+        function getExcel(){
+            //获取参数
+            var keyword = $('#keyword').val();
+            if(!keyword){
+                keyword = '';
+            }
+            //创建xhr对象
+            var url = 'getExcel';
+            var data = encodeFormData({keyword: keyword});
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', url, true);
+            xhr.responseType = "blob";
+            //请求时显示遮罩层
+            xhr.onloadstart = function() {
+                showMask();
+            };
+            xhr.onload = function () {
+                //请求成功回调函数
+                if (this.status === 200) {
+                    var fileName = this.getResponseHeader("Content-Disposition");
+                    var blob = this.response;
+                    var reader = new FileReader();
+                    reader.readAsDataURL(blob);
+                    reader.onload = function(e) {
+                        var a = document.createElement('a');
+                        a.download = fileName;
+                        a.href = e.target.result;
+                        $('body').append(a);
+                        a.click();
+                        a.remove();
+                    }
+                }
+            };
+            //请求完成关闭遮罩层
+            xhr.onloadend = function() {
+                closeMask();
+            };
+            //设置请求头
+            xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+            //发送请求
+            xhr.send(data);
+        }
+
+        //将数据对象格式化伪FormData
+        function encodeFormData(data){
+            if(!data) return '';
+            var pairs = [];
+            for(var name in data){
+                if(!data.hasOwnProperty(name)) continue;
+                if(typeof data[name] === 'function') continue;
+                var value = data[name].toString();
+                name = encodeURIComponent(name.replace('%20','+'));
+                value = encodeURIComponent(value.replace('%20','+'));
+                pairs.push(name+'='+value);
+            }
+            return pairs.join('&');
+        }
+    </script>
 </body>
 </html>

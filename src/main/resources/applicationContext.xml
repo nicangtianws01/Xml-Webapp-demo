@@ -19,7 +19,7 @@
     <!-- dataSource 配置 -->
     <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
         <!-- 基本属性 url、user、password -->
-        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
         <property name="url" value="${db.jdbcUrl}"/>
         <property name="username" value="${db.username}"/>
         <property name="password" value="${db.password}"/>
@@ -41,11 +41,13 @@
     <!--配置SqlSessionFactory工厂对象-->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="mybatis-config.xml"/>
     </bean>
     
     <!-- spring与mybatis整合配置，自动扫描所有dao ,将dao接口生成代理注入到Spring-->
     <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="com.ws.demo.dao"/>
+
     </bean>
     
 </beans>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    namespace一般指定为当前文件的所在包路径+文件名
+    将来在程序中通过[ namespace + id ]定位到执行哪一条SQL语句]
+    并且namespace、id的值不能重复
+ -->
+<mapper namespace="com.ws.demo.dao.TicketDao">
+    <!-- 通过select、insert、update、delete标签声明要执行的SQL -->
+    <!-- 查询所有员工信息
+        需要在resultType属性中指定泛型（查询结果放到对象）
+     -->
+    <select id="getTicketList" resultType="Ticket">
+        select *from ticket
+        where company like concat('%',#{keyword},'%');
+    </select>
+</mapper>
